@@ -1,0 +1,16 @@
+package.json
+  h_8e80b2b4b22af3 8
+src/commands/diff.ts
+  h_8e80b2b4b22af3 1-207
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.3.4",
+  "base_commit_sha": "8b4d1eb42c2d93b1aa235d5c7e745d77464696a4",
+  "prompts": {},
+  "humans": {
+    "h_8e80b2b4b22af3": {
+      "author": "Bell"
+    }
+  }
+}
