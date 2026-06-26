@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "kb:sync": "tsx --env-file=.env src/commands/sync.ts",
-    "kb:diff": "tsx src/commands/diff.ts",
+    "kb:diff": "tsx --env-file=.env src/commands/diff.ts",
     "kb:promote": "tsx src/commands/promote.ts",
     "kb:check": "tsx src/commands/check.ts",
     "kb:publish": "tsx src/commands/publish.ts"
