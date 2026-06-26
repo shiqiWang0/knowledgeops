@@ -1,0 +1,27 @@
+{
+  "name": "knowledgeops",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "kb:sync": "tsx --env-file=.env src/commands/sync.ts",
+    "kb:diff": "tsx src/commands/diff.ts",
+    "kb:promote": "tsx src/commands/promote.ts",
+    "kb:check": "tsx src/commands/check.ts",
+    "kb:publish": "tsx src/commands/publish.ts"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "packageManager": "pnpm@10.15.1",
+  "dependencies": {
+    "execa": "^9.6.1",
+    "fast-glob": "^3.3.3",
+    "gray-matter": "^4.0.3"
+  },
+  "devDependencies": {
+    "@types/node": "^26.0.1",
+    "tsx": "^4.22.4",
+    "typescript": "^6.0.3"
+  }
+}
