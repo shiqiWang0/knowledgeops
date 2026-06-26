@@ -6,7 +6,7 @@
   "scripts": {
     "kb:sync": "tsx --env-file=.env src/commands/sync.ts",
     "kb:diff": "tsx --env-file=.env src/commands/diff.ts",
-    "kb:promote": "tsx src/commands/promote.ts",
+    "kb:editorial": "tsx --env-file=.env src/commands/editorial.ts",
     "kb:check": "tsx src/commands/check.ts",
     "kb:publish": "tsx src/commands/publish.ts"
   },
@@ -17,7 +17,8 @@
   "dependencies": {
     "execa": "^9.6.1",
     "fast-glob": "^3.3.3",
-    "gray-matter": "^4.0.3"
+    "gray-matter": "^4.0.3",
+    "openai": "^6.45.0"
   },
   "devDependencies": {
     "@types/node": "^26.0.1",
