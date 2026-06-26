@@ -9,14 +9,13 @@
     "kb:editorial": "tsx --env-file=.env src/commands/editorial.ts",
     "kb:submit": "tsx --env-file=.env src/commands/submit.ts",
     "kb:checked": "tsx --env-file=.env src/commands/checked.ts",
-    "kb:publish": "tsx src/commands/publish.ts"
+    "kb:publish": "tsx --env-file=.env src/commands/publish.ts"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "packageManager": "pnpm@10.15.1",
   "dependencies": {
-    "execa": "^9.6.1",
     "fast-glob": "^3.3.3",
     "gray-matter": "^4.0.3",
     "openai": "^6.45.0"
