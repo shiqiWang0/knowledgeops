@@ -32,6 +32,15 @@ type EditorialItem = {
   sourceMirrorPath: string;
 };
 
+type EditorialDraftResult = {
+  display_title: string;
+  summary: string;
+  tags: string[];
+  category?: string;
+  cover?: string;
+  content: string;
+};
+
 async function pathExists(filePath: string) {
   try {
     await fs.access(filePath);
@@ -92,16 +101,52 @@ function stripThinkBlocks(content: string) {
     .trim();
 }
 
+function extractJsonObject(content: string) {
+  const cleaned = content
+    .replace(/^```json\s*/i, "")
+    .replace(/^```\s*/i, "")
+    .replace(/```$/i, "")
+    .trim();
+
+  const start = cleaned.indexOf("{");
+  const end = cleaned.lastIndexOf("}");
+
+  if (start === -1 || end === -1 || end <= start) {
+    throw new Error("AI output is not valid JSON object");
+  }
+
+  return cleaned.slice(start, end + 1);
+}
+
+function parseEditorialResult(content: string): EditorialDraftResult {
+  const jsonText = extractJsonObject(content);
+  const parsed = JSON.parse(jsonText);
+
+  if (!parsed.content || typeof parsed.content !== "string") {
+    throw new Error("AI JSON missing content");
+  }
+
+  return {
+    display_title: String(parsed.display_title || ""),
+    summary: String(parsed.summary || ""),
+    tags: Array.isArray(parsed.tags) ? parsed.tags.map(String) : [],
+    category: parsed.category ? String(parsed.category) : "",
+    cover: parsed.cover ? String(parsed.cover) : "",
+    content: parsed.content.trim(),
+  };
+}
+
 async function generateEditorialDraft(params: {
   prompt: string;
   title: string;
   sourceContent: string;
-}) {
+}): Promise<EditorialDraftResult> {
   const { prompt, title, sourceContent } = params;
 
   const res = await client.chat.completions.create({
     model: OPENAI_MODEL,
     temperature: 0.4,
+    response_format: { type: "json_object" },
     messages: [
       {
         role: "system",
@@ -109,42 +154,47 @@ async function generateEditorialDraft(params: {
       },
       {
         role: "user",
-        content: `请加工下面这篇文档：\n\n标题：${title}\n\n原始内容：\n\n${sourceContent}`,
+        content: `请加工下面这篇文档，并严格返回 JSON：\n\n标题：${title}\n\n原始内容：\n\n${sourceContent}`,
       },
     ],
   });
 
   const content = res.choices[0]?.message?.content?.trim() || "";
-  return stripThinkBlocks(content);
+  return parseEditorialResult(stripThinkBlocks(content));
 }
 
 function buildDraftFile(params: {
   title: string;
   slug: string;
   sourceMirrorPath: string;
-  aiContent: string;
+  aiResult: EditorialDraftResult;
 }) {
-  const { title, slug, sourceMirrorPath, aiContent } = params;
+  const { title, slug, sourceMirrorPath, aiResult } = params;
 
-  return `---
-title: "${title}"
-source: yuque
-source_path: "${sourceMirrorPath}"
-status: draft
-editorial_status: ai_generated
-publish: false
-check_status: pending
-target_path: "${TARGET_CONTENT_DIR}/${slug}.md"
----
-
-${aiContent}
-
+  return matter.stringify(
+    `${aiResult.content}
 ---
 
 ## 原始资料链接
 
 - [[${sourceMirrorPath.replace(/\.md$/i, "")}]]
-`;
+`,
+    {
+      title,
+      display_title: aiResult.display_title || title,
+      summary: aiResult.summary || "",
+      tags: aiResult.tags || [],
+      category: aiResult.category || "",
+      cover: aiResult.cover || "",
+      source: "yuque",
+      source_path: sourceMirrorPath,
+      status: "draft",
+      editorial_status: "ai_generated",
+      publish: false,
+      check_status: "pending",
+      target_path: `${TARGET_CONTENT_DIR}/${slug}.mdx`,
+    }
+  );
 }
 
 async function processItem(params: {
@@ -182,10 +232,10 @@ async function processItem(params: {
 
   spinner.start(`${label} Generating editorial draft: ${title}`);
 
-  let aiContent = "";
+  let aiResult: EditorialDraftResult | null = null;
 
   try {
-    aiContent = await generateEditorialDraft({
+    aiResult = await generateEditorialDraft({
       prompt,
       title,
       sourceContent,
@@ -194,7 +244,7 @@ async function processItem(params: {
     spinner.stop();
   }
 
-  if (!aiContent) {
+  if (!aiResult?.content) {
     console.warn(`${label} AI returned empty content, skipped: ${title}`);
     return false;
   }
@@ -203,7 +253,7 @@ async function processItem(params: {
     title,
     slug,
     sourceMirrorPath: item.sourceMirrorPath,
-    aiContent,
+    aiResult,
   });
 
   await fs.mkdir(draftRoot, { recursive: true });
