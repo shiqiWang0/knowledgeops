@@ -1,0 +1,28 @@
+.codex/skills/knowledgeops-publish/agents/openai.yaml
+  3fe9da06747efe57 1-4
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.3.4",
+  "base_commit_sha": "1fe7cd9576e0ee40f52abd4685b016be2c041f50",
+  "prompts": {
+    "3fe9da06747efe57": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "019f1639-486a-7180-aac8-601d21fa00f9",
+        "model": "gpt-5.5"
+      },
+      "human_author": "Bell",
+      "messages": [],
+      "total_additions": 91,
+      "total_deletions": 2,
+      "accepted_lines": 34,
+      "overriden_lines": 14
+    }
+  },
+  "humans": {
+    "h_8e80b2b4b22af3": {
+      "author": "Bell"
+    }
+  }
+}
