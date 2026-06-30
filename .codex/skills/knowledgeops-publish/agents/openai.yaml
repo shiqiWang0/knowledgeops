@@ -1,0 +1,4 @@
+interface:
+  display_name: "KnowledgeOps Publish"
+  short_description: "运行语雀到 GitHub PR 的发布流程"
+  default_prompt: "使用 $knowledgeops-publish 检查语雀变更，生成 AI 编辑初稿，并创建 GitHub PR。"
